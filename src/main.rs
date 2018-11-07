@@ -14,7 +14,11 @@ use rand::Rng;
 const WINDOW_WIDTH : u32 = 240;
 const WINDOW_HEIGHT : u32 = 120;
 
+const CHANGE_FREQUENCY : u32 = 2;
+const CHANGE_PROPABILITY : f32 = 0.7;
+
 const COUNTDOWN_FROM : u32 = 3;
+
 const GOAL_POSITION : u32 = 220;
 const PLAYER_START : u32 = 25;
 const SCREEN_PADDING : u32 = 5;
@@ -295,7 +299,9 @@ enum UIState {
 
 pub struct MainState {
     assets: Assets,
+    change_mode: bool,
     players: Vec<Player>,
+    rng: rand::ThreadRng,
     timer: Timer,
     ui: UIState,
     winner: u32,
@@ -307,10 +313,14 @@ impl MainState {
 
         let assets = Assets::new(ctx)?;
 
+        let rng = rand::thread_rng();
+
         let s = MainState {
             assets,
-            timer: Timer::new(),
+            change_mode: false,
             players: Vec::new(),
+            rng,
+            timer: Timer::new(),
             ui: UIState::Select,
             winner: 0,
         };
@@ -330,6 +340,21 @@ impl event::EventHandler for MainState {
                         self.winner = (i + 1) as u32;
                         self.ui = UIState::Win;
                     }
+                }
+
+                let timer_value = self.timer.get_value();
+
+                if is_countdown_finished(timer_value) && timer_value % CHANGE_FREQUENCY == 0 {
+                    if !self.change_mode {
+                        self.change_mode = true;
+
+                        if rand::random::<f32>() < CHANGE_PROPABILITY {
+                            let random_index = self.rng.gen_range(0, self.players.len());
+                            self.players[random_index].assign_random_key();
+                        }
+                    }
+                } else {
+                    self.change_mode = false;
                 }
             }
             _ => (),
