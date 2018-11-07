@@ -5,3 +5,4 @@ authors = ["Andreas Dzialocha <kontakt@andreasdzialocha.com>"]
 
 [dependencies]
 ggez = "0.4.4"
+rand = "0.5.5"
