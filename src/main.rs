@@ -12,8 +12,7 @@ use ggez::timer;
 use rand::Rng;
 
 const WINDOW_WIDTH : u32 = 240;
-const WINDOW_HEIGHT : u32 = 95;
-const WINDOW_TITLE : &str = "Lunatics";
+const WINDOW_HEIGHT : u32 = 120;
 
 const COUNTDOWN_FROM : u32 = 3;
 const GOAL_POSITION : u32 = 220;
@@ -169,7 +168,7 @@ fn draw_player(
         for (x, &value) in row.iter().enumerate() {
             if value == 1 {
                 let pos_x = x as f32 + offset_x;
-                let pos_y = y as f32 + offset_y + SCREEN_PADDING as f32;
+                let pos_y = y as f32 + offset_y + 2.0;
 
                 points.push(graphics::Point2::new(pos_x, pos_y));
             }
@@ -184,7 +183,7 @@ fn draw_player(
         ctx,
         assets,
         &player.get_key(),
-        graphics::Point2::new(SCREEN_PADDING as f32, offset_y + 1.0)
+        graphics::Point2::new(SCREEN_PADDING as f32, offset_y - 2.0)
     )?;
 
     Ok(())
@@ -213,7 +212,7 @@ pub fn draw_countdown_screen(
         ctx,
         &assets,
         &countdown.to_string(),
-        graphics::Point2::new(120.0, 25.0)
+        graphics::Point2::new(120.0, 50.0)
     )?;
 
     Ok(())
@@ -368,7 +367,7 @@ impl event::EventHandler for MainState {
         ctx: &mut ggez::Context,
         keycode: event::Keycode,
         _keymod: event::Mod,
-        _repeat: bool
+        repeat: bool
     ) {
         match self.ui {
             UIState::Select => {
@@ -381,6 +380,10 @@ impl event::EventHandler for MainState {
                 }
             }
             UIState::Play => {
+                if repeat {
+                    return;
+                }
+
                 move_players(self, keycode);
             }
             UIState::Win => {
@@ -397,7 +400,7 @@ impl event::EventHandler for MainState {
 
 pub fn main() {
     let window_setup = conf::WindowSetup::default()
-        .title(WINDOW_TITLE);
+        .title("Lunatics");
 
     let window_mode = conf::WindowMode::default()
         .dimensions(WINDOW_WIDTH, WINDOW_HEIGHT);
