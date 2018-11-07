@@ -13,7 +13,7 @@ use ggez::graphics;
 use ggez::timer;
 use rand::Rng;
 
-const WINDOW_WIDTH : u32 = 240;
+const WINDOW_WIDTH : u32 = 190;
 const WINDOW_HEIGHT : u32 = 95;
 
 const CHANGE_FREQUENCY : u32 = 2;
@@ -21,7 +21,7 @@ const CHANGE_PROPABILITY : f32 = 0.7;
 
 const COUNTDOWN_FROM : u32 = 3;
 
-const GOAL_POSITION : u32 = 230;
+const GOAL_POSITION : u32 = 180;
 const PLAYER_START : u32 = 20;
 const SCREEN_PADDING : u32 = 5;
 
@@ -138,8 +138,8 @@ const ALPHABET : [[[u32; 5]; 5]; 35] = [
         [1, 1, 1, 1, 1],
         [0, 0, 0, 0, 1],
         [0, 0, 0, 0, 1],
-        [0, 0, 0, 1, 0],
-        [0, 1, 1, 0, 0],
+        [1, 0, 0, 0, 1],
+        [0, 1, 1, 1, 0],
     ],
     [
         [1, 0, 0, 0, 1],
@@ -485,7 +485,7 @@ pub fn draw_select_screen(
     draw_text(
         ctx,
         "Press number of players",
-        graphics::Point2::new(30.0, 40.0)
+        graphics::Point2::new(5.0, 40.0)
     )?;
 
     Ok(())
@@ -498,7 +498,7 @@ pub fn draw_countdown_screen(
     draw_text(
         ctx,
         &countdown.to_string(),
-        graphics::Point2::new(120.0, 40.0)
+        graphics::Point2::new(95.0, 40.0)
     )?;
 
     Ok(())
@@ -530,7 +530,7 @@ pub fn draw_winner_screen(
     draw_text(
         ctx,
         &format!("player {} won", winner_no),
-        graphics::Point2::new(75.0, 40.0)
+        graphics::Point2::new(50.0, 40.0)
     )?;
 
     Ok(())
