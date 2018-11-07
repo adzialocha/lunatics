@@ -1,8 +1,6 @@
 lunatics
 ---
 
-The smallest running game ever *)
+#### The smallest running game.
 
-```
-*) actually its my first project to learn Rust 8-)
-```
+Or my first project to learn [Rust](https://www.rust-lang.org/) 🐤
