@@ -12,38 +12,318 @@ use ggez::timer;
 use rand::Rng;
 
 const WINDOW_WIDTH : u32 = 240;
-const WINDOW_HEIGHT : u32 = 120;
+const WINDOW_HEIGHT : u32 = 95;
 
 const CHANGE_FREQUENCY : u32 = 2;
 const CHANGE_PROPABILITY : f32 = 0.7;
 
 const COUNTDOWN_FROM : u32 = 3;
 
-const GOAL_POSITION : u32 = 220;
-const PLAYER_START : u32 = 25;
+const GOAL_POSITION : u32 = 230;
+const PLAYER_START : u32 = 20;
 const SCREEN_PADDING : u32 = 5;
 
-const LUNATIC_RUNNING : [[[u32; 3]; 3]; 4] = [
+const LUNATIC_RUNNING : [[[u32; 5]; 5]; 6] = [
     [
-        [0, 1, 0],
-        [0, 1, 0],
-        [1, 0, 1],
+        [0, 0, 1, 0, 0],
+        [0, 1, 1, 1, 0],
+        [0, 0, 1, 0, 0],
+        [0, 1, 0, 1, 0],
+        [0, 1, 0, 1, 0],
     ],
     [
-        [0, 1, 0],
-        [1, 1, 0],
-        [1, 1, 0],
+        [0, 0, 1, 0, 0],
+        [0, 1, 1, 1, 0],
+        [0, 0, 1, 0, 0],
+        [0, 1, 1, 0, 0],
+        [0, 1, 0, 1, 0],
     ],
     [
-        [0, 1, 0],
-        [0, 1, 0],
-        [1, 0, 0],
+        [0, 0, 1, 0, 0],
+        [0, 1, 1, 1, 0],
+        [0, 0, 1, 0, 0],
+        [0, 0, 1, 0, 0],
+        [0, 0, 1, 0, 0],
     ],
     [
-        [0, 1, 0],
-        [0, 1, 1],
-        [1, 0, 1],
+        [0, 0, 1, 0, 0],
+        [0, 1, 1, 1, 0],
+        [0, 0, 1, 0, 0],
+        [0, 1, 0, 1, 0],
+        [0, 1, 0, 0, 0],
     ],
+    [
+        [0, 0, 1, 0, 0],
+        [0, 1, 1, 1, 0],
+        [0, 0, 1, 0, 0],
+        [0, 1, 0, 1, 0],
+        [1, 0, 0, 0, 1],
+    ],
+    [
+        [0, 0, 1, 0, 0],
+        [0, 1, 1, 1, 0],
+        [0, 0, 1, 0, 0],
+        [0, 1, 0, 1, 0],
+        [1, 0, 0, 1, 0],
+    ],
+];
+
+const ALPHABET : [[[u32; 5]; 5]; 35] = [
+    [
+        [0, 0, 1, 0, 0],
+        [0, 1, 0, 1, 0],
+        [1, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 1],
+    ],
+    [
+        [1, 1, 1, 1, 0],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 1, 0],
+        [1, 0, 0, 0, 1],
+        [1, 1, 1, 1, 0],
+    ],
+    [
+        [1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0],
+        [1, 0, 0, 0, 0],
+        [1, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1],
+    ],
+    [
+        [1, 1, 1, 0, 0],
+        [1, 0, 0, 1, 0],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 1, 0],
+        [1, 1, 1, 0, 0],
+    ],
+    [
+        [1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0],
+        [1, 1, 1, 1, 0],
+        [1, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1],
+    ],
+    [
+        [1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0],
+        [1, 0, 0, 0, 0],
+    ],
+    [
+        [1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0],
+        [1, 0, 1, 1, 1],
+        [1, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1],
+    ],
+    [
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+    ],
+    [
+        [0, 0, 1, 0, 0],
+        [0, 0, 1, 0, 0],
+        [0, 0, 1, 0, 0],
+        [0, 0, 1, 0, 0],
+        [0, 0, 1, 0, 0],
+    ],
+    [
+        [1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 1, 0],
+        [0, 1, 1, 0, 0],
+    ],
+    [
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 1, 0],
+        [1, 1, 1, 0, 0],
+        [1, 0, 0, 1, 0],
+        [1, 0, 0, 0, 1],
+    ],
+    [
+        [1, 0, 0, 0, 0],
+        [1, 0, 0, 0, 0],
+        [1, 0, 0, 0, 0],
+        [1, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1],
+    ],
+    [
+        [0, 1, 0, 1, 1],
+        [1, 0, 1, 0, 1],
+        [1, 0, 1, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+    ],
+    [
+        [1, 0, 0, 0, 1],
+        [1, 1, 0, 0, 1],
+        [1, 0, 1, 0, 1],
+        [1, 0, 0, 1, 1],
+        [1, 0, 0, 0, 1],
+    ],
+    [
+        [1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1],
+    ],
+    [
+        [1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0],
+        [1, 0, 0, 0, 0],
+    ],
+    [
+        [1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 1, 0],
+        [1, 1, 1, 0, 1],
+    ],
+    [
+        [1, 1, 1, 0, 0],
+        [1, 0, 0, 1, 0],
+        [1, 0, 0, 0, 1],
+        [1, 1, 1, 1, 0],
+        [1, 0, 0, 1, 0],
+    ],
+    [
+        [1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0],
+        [1, 1, 1, 1, 0],
+        [0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1],
+    ],
+    [
+        [1, 1, 1, 1, 1],
+        [0, 0, 1, 0, 0],
+        [0, 0, 1, 0, 0],
+        [0, 0, 1, 0, 0],
+        [0, 0, 1, 0, 0],
+    ],
+    [
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [0, 1, 1, 1, 0],
+    ],
+    [
+        [1, 0, 0, 0, 1],
+        [0, 1, 0, 1, 0],
+        [0, 1, 0, 1, 0],
+        [0, 0, 1, 0, 0],
+        [0, 0, 1, 0, 0],
+    ],
+    [
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 1, 0, 1],
+        [1, 0, 1, 0, 1],
+        [0, 1, 0, 1, 1],
+    ],
+    [
+        [1, 0, 0, 0, 1],
+        [0, 1, 0, 1, 0],
+        [0, 0, 1, 0, 0],
+        [0, 1, 0, 1, 0],
+        [1, 0, 0, 0, 1],
+    ],
+    [
+        [1, 0, 0, 0, 1],
+        [0, 1, 0, 1, 0],
+        [0, 0, 1, 0, 0],
+        [0, 0, 1, 0, 0],
+        [0, 0, 1, 0, 0],
+    ],
+    [
+        [1, 1, 1, 1, 1],
+        [0, 0, 0, 1, 0],
+        [0, 0, 1, 0, 0],
+        [0, 1, 0, 0, 0],
+        [1, 1, 1, 1, 1],
+    ],
+    [
+        [0, 0, 1, 0, 0],
+        [0, 1, 1, 0, 0],
+        [1, 0, 1, 0, 0],
+        [0, 0, 1, 0, 0],
+        [0, 0, 1, 0, 0],
+    ],
+    [
+        [0, 1, 1, 1, 1],
+        [1, 0, 0, 0, 1],
+        [0, 0, 1, 1, 0],
+        [0, 1, 0, 0, 0],
+        [1, 1, 1, 1, 1],
+    ],
+    [
+        [1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 1],
+        [0, 0, 1, 1, 1],
+        [0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1],
+    ],
+    [
+        [1, 0, 1, 0, 0],
+        [1, 0, 1, 0, 0],
+        [1, 1, 1, 1, 1],
+        [0, 0, 1, 0, 0],
+        [0, 0, 1, 0, 0],
+    ],
+    [
+        [1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0],
+        [1, 1, 1, 1, 0],
+        [0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 0],
+    ],
+    [
+        [1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0],
+        [1, 1, 1, 1, 0],
+        [1, 0, 0, 0, 1],
+        [1, 1, 1, 1, 0],
+    ],
+    [
+        [1, 1, 1, 1, 1],
+        [0, 0, 0, 1, 0],
+        [0, 0, 1, 0, 0],
+        [0, 1, 0, 0, 0],
+        [1, 0, 0, 0, 0],
+    ],
+    [
+        [0, 1, 1, 1, 0],
+        [1, 0, 0, 0, 1],
+        [0, 1, 1, 1, 0],
+        [1, 0, 0, 0, 1],
+        [0, 1, 1, 1, 0],
+    ],
+    [
+        [1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1],
+    ],
+];
+
+const ALPHABET_STR : [char; 35]= [
+    'A', 'B', 'C', 'D', 'E',
+    'F', 'G', 'H', 'I', 'J',
+    'K', 'L', 'M', 'N', 'O',
+    'P', 'Q', 'R', 'S', 'T',
+    'U', 'V', 'W', 'X', 'Y',
+    'Z', '1', '2', '3', '4',
+    '5', '6', '7', '8', '9',
 ];
 
 fn get_random_char() -> char {
@@ -83,20 +363,6 @@ impl Timer {
     pub fn update(&mut self, ctx: &ggez::Context) {
         let time_passed = timer::duration_to_f64(timer::get_time_since_start(ctx)) - timer::duration_to_f64(self.started);
         self.value = time_passed as f32;
-    }
-}
-
-pub struct Assets {
-    pub font: graphics::Font,
-}
-
-impl Assets {
-    pub fn new(ctx: &mut ggez::Context) -> ggez::GameResult<Assets> {
-        let font = graphics::Font::new_px(ctx, "/font.ttf", 9)?;
-
-        Ok(Assets {
-            font,
-        })
     }
 }
 
@@ -143,51 +409,69 @@ impl Player {
     }
 }
 
+fn draw_bitfield<'a, T, U>(
+    ctx: &mut ggez::Context,
+    bitfield: &'a T,
+    pos_x: f32,
+    pos_y: f32,
+) -> ggez::GameResult<()>
+where
+    &'a T: std::iter::IntoIterator<Item = U>,
+    U: std::iter::IntoIterator<Item = &'a u32>,
+{
+    let mut points: Vec<graphics::Point2> = vec![];
+
+    for (y, row) in bitfield.into_iter().enumerate() {
+        for (x, &value) in row.into_iter().enumerate() {
+            if value == 1 {
+                let point_x = x as f32 + pos_x;
+                let point_y = y as f32 + pos_y;
+
+                points.push(graphics::Point2::new(point_x, point_y));
+            }
+        }
+    }
+
+    graphics::points(ctx, &points, 1.0)?;
+
+    Ok(())
+}
+
 fn draw_text(
     ctx: &mut ggez::Context,
-    assets: &Assets,
     text: &str,
     position: graphics::Point2,
 ) -> ggez::GameResult<()> {
-    let mut key = graphics::Text::new(ctx, &text, &assets.font)?;
-    key.set_filter(graphics::FilterMode::Nearest);
-    graphics::draw(ctx, &key, position, 0.0)?;
+    for (i, character) in text.to_uppercase().chars().enumerate() {
+        let pos_x = position.x + (i as f32 * 8.0);
+        let pos_y = position.y;
+
+        match ALPHABET_STR.iter().position(|&x| x == character) {
+            Some(character_index) => {
+                draw_bitfield(ctx, &ALPHABET[character_index], pos_x, pos_y)?;
+            }
+            None => ()
+        }
+    }
 
     Ok(())
 }
 
 fn draw_player(
     ctx: &mut ggez::Context,
-    assets: &Assets,
     player: &Player,
     offset_y: f32,
 ) -> ggez::GameResult<()> {
-    let mut points: Vec<graphics::Point2> = vec![];
-
     let position = player.get_position();
     let frame = position % LUNATIC_RUNNING.len();
     let offset_x: f32 = position as f32 + PLAYER_START as f32;
 
-    for (y, row) in LUNATIC_RUNNING[frame].iter().enumerate() {
-        for (x, &value) in row.iter().enumerate() {
-            if value == 1 {
-                let pos_x = x as f32 + offset_x;
-                let pos_y = y as f32 + offset_y + 2.0;
+    draw_bitfield(ctx, &LUNATIC_RUNNING[frame], offset_x, offset_y)?;
 
-                points.push(graphics::Point2::new(pos_x, pos_y));
-            }
-        }
-    }
-
-    // Draw player
-    graphics::points(ctx, &points, 1.0)?;
-
-    // Draw current key
     draw_text(
         ctx,
-        assets,
         &player.get_key(),
-        graphics::Point2::new(SCREEN_PADDING as f32, offset_y - 2.0)
+        graphics::Point2::new(SCREEN_PADDING as f32, offset_y)
     )?;
 
     Ok(())
@@ -195,13 +479,11 @@ fn draw_player(
 
 pub fn draw_select_screen(
     ctx: &mut ggez::Context,
-    assets: &Assets,
 ) -> ggez::GameResult<()> {
     draw_text(
         ctx,
-        &assets,
-        "Press the number of players to start.",
-        graphics::Point2::new(25.0, 10.0)
+        "Press number of players",
+        graphics::Point2::new(30.0, 40.0)
     )?;
 
     Ok(())
@@ -209,14 +491,12 @@ pub fn draw_select_screen(
 
 pub fn draw_countdown_screen(
     ctx: &mut ggez::Context,
-    assets: &Assets,
     countdown: u32,
 ) -> ggez::GameResult<()> {
     draw_text(
         ctx,
-        &assets,
         &countdown.to_string(),
-        graphics::Point2::new(120.0, 50.0)
+        graphics::Point2::new(120.0, 40.0)
     )?;
 
     Ok(())
@@ -224,14 +504,12 @@ pub fn draw_countdown_screen(
 
 pub fn draw_players_screen(
     ctx: &mut ggez::Context,
-    assets: &Assets,
     players: &mut Vec<Player>
 ) -> ggez::GameResult<()> {
     for (i, player) in players.iter().enumerate() {
-        let player_height = WINDOW_HEIGHT / players.len() as u32;
-        let offset = (i as f32 * player_height as f32) + SCREEN_PADDING as f32;
+        let offset = (i as f32 * 10.0 as f32) + SCREEN_PADDING as f32;
 
-        draw_player(ctx, &assets, player, offset)?;
+        draw_player(ctx, player, offset)?;
     }
 
     let points = &[
@@ -245,14 +523,12 @@ pub fn draw_players_screen(
 
 pub fn draw_winner_screen(
     ctx: &mut ggez::Context,
-    assets: &Assets,
     winner_no: u32,
 ) -> ggez::GameResult<()> {
     draw_text(
         ctx,
-        &assets,
-        &format!("player {} won!!", winner_no),
-        graphics::Point2::new(80.0, 35.0)
+        &format!("player {} won", winner_no),
+        graphics::Point2::new(75.0, 40.0)
     )?;
 
     Ok(())
@@ -298,7 +574,6 @@ enum UIState {
 }
 
 pub struct MainState {
-    assets: Assets,
     change_mode: bool,
     players: Vec<Player>,
     rng: rand::ThreadRng,
@@ -311,12 +586,9 @@ impl MainState {
     pub fn new(ctx: &mut ggez::Context) -> ggez::GameResult<MainState> {
         graphics::set_background_color(ctx, (0, 0, 255, 255).into());
 
-        let assets = Assets::new(ctx)?;
-
         let rng = rand::thread_rng();
 
         let s = MainState {
-            assets,
             change_mode: false,
             players: Vec::new(),
             rng,
@@ -368,17 +640,17 @@ impl event::EventHandler for MainState {
 
         match self.ui {
             UIState::Select => {
-                draw_select_screen(ctx, &self.assets)?;
+                draw_select_screen(ctx)?;
             }
             UIState::Play => {
                 let time = self.timer.get_value();
                 if !is_countdown_finished(time) {
-                    draw_countdown_screen(ctx, &self.assets, convert_countdown(time))?;
+                    draw_countdown_screen(ctx, convert_countdown(time))?;
                 }
-                draw_players_screen(ctx, &self.assets, &mut self.players)?;
+                draw_players_screen(ctx, &mut self.players)?;
             }
             UIState::Win => {
-                draw_winner_screen(ctx, &self.assets, self.winner)?;
+                draw_winner_screen(ctx, self.winner)?;
             }
         }
 
@@ -432,8 +704,7 @@ pub fn main() {
 
     let cb = ggez::ContextBuilder::new("luncatics", "adzialocha")
         .window_setup(window_setup)
-        .window_mode(window_mode)
-        .add_resource_path("resources");
+        .window_mode(window_mode);
 
     let ctx = &mut cb.build().unwrap();
 
