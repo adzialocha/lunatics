@@ -3,6 +3,8 @@
 extern crate ggez;
 extern crate rand;
 
+use std::env;
+use std::path;
 use std::time;
 
 use ggez::conf;
@@ -697,14 +699,21 @@ impl event::EventHandler for MainState {
 
 pub fn main() {
     let window_setup = conf::WindowSetup::default()
+        .icon("/icon.png")
         .title("Lunatics");
 
     let window_mode = conf::WindowMode::default()
         .dimensions(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    let cb = ggez::ContextBuilder::new("luncatics", "adzialocha")
+    let mut cb = ggez::ContextBuilder::new("luncatics", "adzialocha")
         .window_setup(window_setup)
         .window_mode(window_mode);
+
+    if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
+        let mut path = path::PathBuf::from(manifest_dir);
+        path.push("resources");
+        cb = cb.add_resource_path(path);
+    }
 
     let ctx = &mut cb.build().unwrap();
 
